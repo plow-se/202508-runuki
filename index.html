@@ -1,74 +1,4 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <title>ルンウキ フォトカメラ｜釣り×沖縄フレーム</title>
-  <style>
-    :root { --bg:#0f172a; --card:#111827; --text:#e5e7eb; --accent:#22d3ee; }
-    *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#0b1223,#101827);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif}
-    header{padding:14px 16px;border-bottom:1px solid #243147;display:flex;align-items:center;justify-content:space-between;gap:12px}
-    header h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.02em}
-    .badge{font-size:12px;background:#0ea5a5;color:#00120f;padding:4px 8px;border-radius:999px}
-    main{max-width:900px;margin:0 auto;padding:16px;display:grid;gap:16px}
-    .card{background:rgba(17,24,39,.7);border:1px solid #243147;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.35)}
-    .stage{position:relative;aspect-ratio:3/4;width:100%;border-radius:16px;overflow:hidden}
-    video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
-    canvas.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-    .controls{display:flex;flex-wrap:wrap;gap:12px;padding:12px}
-    .controls .spacer{flex:1}
-    button, label.button{appearance:none;border:none;border-radius:12px;padding:10px 14px;background:#1f2937;color:#e5e7eb;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-    button:hover, label.button:hover{filter:brightness(1.1)}
-    button.primary{background:linear-gradient(180deg,#06b6d4,#0891b2)}
-    button.success{background:linear-gradient(180deg,#16a34a,#15803d)}
-    button.warn{background:linear-gradient(180deg,#f59e0b,#d97706)}
-    input[type=file]{display:none}
-    .row{display:flex;gap:12px;flex-wrap:wrap;padding:12px}
-    .row .chip{background:#0b1223;border:1px solid #243147;border-radius:999px;padding:8px 12px;cursor:pointer}
-    .hint{opacity:.8;font-size:12px;padding:0 12px 12px}
-    footer{padding:12px 16px;color:#94a3b8;font-size:12px;text-align:center}
-  </style>
-</head>
-<body>
-  <header>
-    <h1>📸 ルンウキ フォトカメラ <span class="badge">アプリ不要・QRで起動</span></h1>
-    <div style="font-size:12px;opacity:.8">「撮影」→「ダウンロード」で保存できます</div>
-  </header>
-
-  <main>
-    <section class="card">
-      <div class="stage" id="stage">
-        <video id="video" playsinline muted></video>
-        <!-- ライブ用オーバーレイ -->
-        <canvas id="overlay" class="overlay"></canvas>
-      </div>
-      <div class="controls">
-        <button id="btnStart" class="primary">🎥 カメラ開始</button>
-        <button id="btnShot" class="success" disabled>📸 撮影</button>
-        <div class="spacer"></div>
-        <button id="modeNone" class="">フレーム：なし</button>
-        <button id="modeFrame1" class="">🌊 リゾートA</button>
-        <button id="modeFrame2" class="">🦁 シーサーB</button>
-        <button id="modeFrame3" class="">🧩 PLOWと写真</button>
-        <label class="button" for="customImg">🖼️ カスタム画像</label>
-        <input type="file" id="customImg" accept="image/*" />
-      </div>
-      <div class="row" id="tips">
-        <div class="chip">🔊 シャッター音は鳴りません</div>
-        <div class="chip">🔒 画像は端末内で処理（サーバー送信なし）</div>
-        <div class="chip">📶 HTTPSでの公開推奨（iOS Safari要件）</div>
-      </div>
-      <div class="hint">※ カメラが映らない場合：Safari/Chromeのカメラ許可をONにし、再読み込みしてください。</div>
-    </section>
-
-    <section class="card" style="padding:12px">
-      <div class="hint">使い方：この1ファイルを公開し、URLをQR化して会場に掲示するだけ。参加者のスマホで開くとカメラが起動し、<b>「リゾートA」「シーサーB」「PLOWと写真」</b>のフレームを重ねて撮影できます。オリジナルのPNGを「カスタム画像」で読み込み可能です。</div>
-    </section>
-  </main>
-
-  <footer>© 2025 ルンウキマーケット / 教育ベンチャー撮影ブース（デモ）</footer>
-
-  <script>
+<script>
   const video = document.getElementById('video');
   const overlay = document.getElementById('overlay');
   const stage = document.getElementById('stage');
@@ -90,16 +20,15 @@
   let mode = 'frame1';
 
   function pad2(n){ return String(n).padStart(2,'0'); }
-function makeFilename(mode){
-  const d = new Date();
-  const y = d.getFullYear(), m = pad2(d.getMonth()+1), day = pad2(d.getDate());
-  const h = pad2(d.getHours()), mi = pad2(d.getMinutes()), s = pad2(d.getSeconds());
-  const labelMap = { frame1: 'resortA', frame2: 'shisaB', frame3: 'plow', none: 'noframe' };
-  const label = labelMap[mode] || 'other';
-  return `runuki-${y}${m}${day}-${h}${mi}${s}-${label}.jpg`;
-}
+  function makeFilename(mode){
+    const d = new Date();
+    const y = d.getFullYear(), m = pad2(d.getMonth()+1), day = pad2(d.getDate());
+    const h = pad2(d.getHours()), mi = pad2(d.getMinutes()), s = pad2(d.getSeconds());
+    const labelMap = { frame1: 'resortA', frame2: 'shisaB', frame3: 'plow', none: 'noframe' };
+    const label = labelMap[mode] || 'other';
+    return `runuki-${y}${m}${day}-${h}${mi}${s}-${label}.jpg`;
+  }
 
-    
   // サイズ調整
   function fitOverlayToVideo(){
     const rect = stage.getBoundingClientRect();
@@ -117,7 +46,7 @@ function makeFilename(mode){
       btnShot.disabled = false;
       fitOverlayToVideo();
     } catch(e){
-      alert('カメラが起動できませんでした。権限やHTTPSをご確認ください。' + '\n' + e);
+      alert('カメラが起動できませんでした。権限やHTTPSをご確認ください。\n' + e);
     }
   });
 
@@ -170,8 +99,7 @@ function makeFilename(mode){
     ctx.drawImage(img, x, y, iw, ih);
   }
 
-  
-  // 撮影
+  // 撮影（自動保存ON、ダウンロードボタン無し）
   btnShot.addEventListener('click', async ()=>{
     if(!stream || video.readyState < 2){ alert('カメラを開始してください。'); return; }
 
@@ -198,59 +126,48 @@ function makeFilename(mode){
       ctx.globalAlpha = 1;
     }
 
- canvas.toBlob((blob)=>{
-  if(lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
-  lastBlobUrl = URL.createObjectURL(blob);
-  // ファイル名を作ってボタンに保持
-  const fname = makeFilename(mode);
-  
-
-  // 連写しやすくするなら、撮影直後に自動DLする場合はこの行をON
-  triggerDownload();
-}, 'image/jpeg', 0.92);
+    canvas.toBlob((blob)=>{
+      if(lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
+      const url = URL.createObjectURL(blob);
+      lastBlobUrl = url;
+      const fname = makeFilename(mode);
+      triggerDownload(url, fname); // ★撮影ごとに自動保存
+    }, 'image/jpeg', 0.92);
   });
 
-function triggerDownload(){
-  const url = btnDownload.dataset.href; 
-  const name = btnDownload.dataset.filename || makeFilename(mode);
-  if(!url) return;
-
-  // Android/PC用：download属性が効く場合はファイル名を指定
-  const a = document.createElement('a');
-  a.href = url;
-  if('download' in HTMLAnchorElement.prototype){
-    a.download = name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  } else {
-    // iOS Safariなど：新しいタブで開いて「写真に保存」を促す
-    window.open(url, '_blank');
+  // 自動保存（iOS対策つき）: 引数でURLとファイル名を受け取る
+  function triggerDownload(url, name){
+    if(!url) return;
+    const a = document.createElement('a');
+    a.href = url;
+    if('download' in HTMLAnchorElement.prototype){
+      // Android/PCなど download属性が効く場合
+      a.download = name || makeFilename(mode);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      // iOS Safariなど：新しいタブで開いて「写真に保存」
+      window.open(url, '_blank');
+    }
   }
-}
 
-  });
-
-  // 画像フレームのプリロード（リポジトリに images/frame1.png, images/frame2.png を置いてください）
+  // 画像フレームのプリロード
   function preload(src){
-  return new Promise((resolve, reject)=>{
-    const img = new Image();
-    img.onload  = ()=> { console.log('loaded:', src); resolve(img); };
-    img.onerror = ()=> { console.warn('failed:', src); reject(new Error('画像を読み込めません: ' + src)); };
-    // キャッシュ回避
-    img.src = src + '?v=' + Date.now();
-  });
-}
-
-(async ()=>{
-  try { frame1 = await preload('images/frame1.png'); } catch(e){ /* 任意 */ }
-  try { frame2 = await preload('images/frame2.png'); } catch(e){ /* 任意 */ }
-  try { frame3 = await preload('images/frame3.png'); } catch(e){
-    alert('frame3 が読み込めませんでした。ファイル名/場所を確認してください。');
+    return new Promise((resolve, reject)=>{
+      const img = new Image();
+      img.onload  = ()=> { console.log('loaded:', src); resolve(img); };
+      img.onerror = ()=> { console.warn('failed:', src); reject(new Error('画像を読み込めません: ' + src)); };
+      // キャッシュ回避
+      img.src = src + '?v=' + Date.now();
+    });
   }
-  fitOverlayToVideo();
-  setMode('frame3'); // 起動時にPLOWと写真を表示
-})();
-  </script>
-</body>
-</html>
+
+  (async ()=>{
+    try { frame1 = await preload('images/frame1.png'); } catch(e){}
+    try { frame2 = await preload('images/frame2.png'); } catch(e){}
+    try { frame3 = await preload('images/frame3.png'); } catch(e){}
+    fitOverlayToVideo();
+    setMode('frame3'); // 起動時にPLOWと写真を表示
+  })();
+</script>
