@@ -48,14 +48,13 @@
         <button id="btnDownload" class>⬇️ ダウンロード</button>
         <div class="spacer"></div>
         <button id="modeNone" class="">フレーム：なし</button>
-        <button id="modeFish" class="">🐟 おさかな</button>
-        <button id="modeOki" class="">🏝️ 沖縄</button>
         <button id="modeFrame1" class="">🌊 リゾートA</button>
         <button id="modeFrame2" class="">🦁 シーサーB</button>
+        <button id="modeFrame3" class="">🧩 PLOWと写真</button>
         <label class="button" for="customImg">🖼️ カスタム画像</label>
         <input type="file" id="customImg" accept="image/*" />
       </div>
-      <div class="row" id="tips">
+      <div class="row"" id="tips">
         <div class="chip">🔊 シャッター音は鳴りません</div>
         <div class="chip">🔒 画像は端末内で処理（サーバー送信なし）</div>
         <div class="chip">📶 HTTPSでの公開推奨（iOS Safari要件）</div>
@@ -64,7 +63,7 @@
     </section>
 
     <section class="card" style="padding:12px">
-      <div class="hint">使い方：この1ファイルを公開し、URLをQR化して会場に掲示するだけ。参加者のスマホで開くとカメラが起動し、<b>「おさかな」や「沖縄」フレーム</b>を重ねて撮影できます。オリジナルのPNGを「カスタム画像」で読み込み可能です。</div>
+      <div class="hint">使い方：この1ファイルを公開し、URLをQR化して会場に掲示するだけ。参加者のスマホで開くとカメラが起動し、<b>「リゾートA」「シーサーB」「PLOWと写真」</b>のフレームを重ねて撮影できます。オリジナルのPNGを「カスタム画像」で読み込み可能です。</div>
     </section>
   </main>
 
@@ -78,19 +77,19 @@
   const btnShot = document.getElementById('btnShot');
   const btnDownload = document.getElementById('btnDownload');
   const modeNone = document.getElementById('modeNone');
-  const modeFish = document.getElementById('modeFish');
-  const modeOki  = document.getElementById('modeOki');
   const modeFrame1 = document.getElementById('modeFrame1');
   const modeFrame2 = document.getElementById('modeFrame2');
+  const modeFrame3 = document.getElementById('modeFrame3');
   const fileInput = document.getElementById('customImg');
 
   let stream = null;
   let lastBlobUrl = null;
   let customImage = null; // HTMLImageElement or null
-  // 追加: PNGフレームの画像
+  // PNGフレーム画像
   let frame1 = null; // リゾートA
   let frame2 = null; // シーサーB
-  let mode = 'fish';
+  let frame3 = null; // PLOWと写真
+  let mode = 'frame1';
 
   // サイズ調整
   function fitOverlayToVideo(){
@@ -116,10 +115,9 @@
   // モード切替
   function setMode(m){ mode = m; drawOverlay(); }
   modeNone.onclick = () => setMode('none');
-  modeFish.onclick = () => setMode('fish');
-  modeOki.onclick  = () => setMode('oki');
   modeFrame1.onclick = () => setMode('frame1');
   modeFrame2.onclick = () => setMode('frame2');
+  modeFrame3.onclick = () => setMode('frame3');
 
   // カスタム画像の読み込み
   fileInput.addEventListener('change', (ev)=>{
@@ -136,17 +134,15 @@
     const w = overlay.width, h = overlay.height;
     ctx.clearRect(0,0,w,h);
 
-    if(mode === 'fish'){
-      drawFishOverlay(ctx, w, h, 0.9);
-    } else if(mode === 'oki'){
-      drawOkinawaOverlay(ctx, w, h, 0.9);
-    } else if(mode === 'frame1' && frame1){
+    if(mode === 'frame1' && frame1){
       drawImageFrame(ctx, frame1, w, h);
     } else if(mode === 'frame2' && frame2){
       drawImageFrame(ctx, frame2, w, h);
+    } else if(mode === 'frame3' && frame3){
+      drawImageFrame(ctx, frame3, w, h);
     }
 
-    if(customImage){ // 右下にリサイズして配置
+    if(customImage){
       const cw = Math.min(w, h) * 0.45;
       const ch = cw * (customImage.height / customImage.width);
       ctx.globalAlpha = 0.95;
@@ -165,55 +161,25 @@
     ctx.drawImage(img, x, y, iw, ih);
   }
 
-  function drawFishOverlay(ctx, w, h, opacity=1){
-    ctx.save(); ctx.globalAlpha = opacity;
-    ctx.lineWidth = Math.max(6, Math.min(w,h)*0.012);
-    ctx.strokeStyle = '#22d3ee';
-    ctx.strokeRect(6,6,w-12,h-12);
-    for(let i=0;i<20;i++){
-      const x = Math.random()*w; const y = Math.random()*h; const r = Math.random()*8+4;
-      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.stroke();
-    }
-    ctx.font = Math.max(20, Math.min(w,h)*0.05) + 'px serif';
-    for(let x=0;x<w; x+= Math.max(60, w*0.12)){
-      ctx.fillText('🐟', x+10, Math.max(30, h*0.15));
-      ctx.fillText('🐠', x+30, Math.max(60, h*0.28));
-    }
-    ctx.restore();
-  }
-
-  function drawOkinawaOverlay(ctx, w, h, opacity=1){
-    ctx.save(); ctx.globalAlpha = opacity;
-    const grad = ctx.createLinearGradient(0,0,0,h);
-    grad.addColorStop(0,'rgba(59,130,246,.25)');
-    grad.addColorStop(1,'rgba(250,204,21,.10)');
-    ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
-    ctx.fillStyle = 'rgba(245, 200, 80, .25)';
-    ctx.beginPath(); ctx.moveTo(0,h*0.82); ctx.quadraticCurveTo(w*0.4,h*0.78, w,h*0.88); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); ctx.fill();
-    ctx.font = Math.max(24, Math.min(w,h)*0.06) + 'px serif';
-    ctx.fillText('🌴', 16, h*0.85);
-    ctx.fillText('🌺', w-48, h*0.20);
-    ctx.fillText('🦀', w*0.15, h*0.9);
-    ctx.fillText('🌀', w*0.75, h*0.2);
-    ctx.restore();
-  }
-
+  
   // 撮影
   btnShot.addEventListener('click', async ()=>{
     if(!stream || video.readyState < 2){ alert('カメラを開始してください。'); return; }
+
+    // キャプチャ用キャンバスを動画サイズに
     const vw = video.videoWidth, vh = video.videoHeight;
     const canvas = document.createElement('canvas');
     canvas.width = vw; canvas.height = vh;
     const ctx = canvas.getContext('2d');
+    // 映像
     ctx.drawImage(video, 0, 0, vw, vh);
-    if(mode === 'fish'){
-      drawFishOverlay(ctx, vw, vh, 0.95);
-    } else if(mode === 'oki'){
-      drawOkinawaOverlay(ctx, vw, vh, 0.95);
-    } else if(mode === 'frame1' && frame1){
+    // オーバーレイ（動画サイズに合わせてリドロー）
+    if(mode === 'frame1' && frame1){
       drawImageFrame(ctx, frame1, vw, vh);
     } else if(mode === 'frame2' && frame2){
       drawImageFrame(ctx, frame2, vw, vh);
+    } else if(mode === 'frame3' && frame3){
+      drawImageFrame(ctx, frame3, vw, vh);
     }
     if(customImage){
       const cw = Math.min(vw, vh) * 0.45;
@@ -229,6 +195,8 @@
       btnDownload.dataset.href = lastBlobUrl;
       btnDownload.classList.add('primary');
       btnDownload.textContent = '⬇️ ダウンロード（撮影済み）';
+      // 直後にプレビュー的に自動ダウンロードしたい場合は以下を有効化：
+      // triggerDownload();
     }, 'image/jpeg', 0.92);
   });
 
@@ -237,16 +205,19 @@
     const a = document.createElement('a'); a.href = url; a.download = 'runuki-photo.jpg'; a.click();
   }
 
-  btnDownload.addEventListener('click', ()=>{ triggerDownload(); });
+  btnDownload.addEventListener('click', ()=>{
+    triggerDownload();
+  });
 
-  // 画像フレームのプリロード
+  // 画像フレームのプリロード（リポジトリに images/frame1.png, images/frame2.png を置いてください）
   function preload(src){
     return new Promise((resolve)=>{ const img = new Image(); img.onload=()=>resolve(img); img.src=src; });
   }
   (async ()=>{
     try { frame1 = await preload('images/frame1.png'); } catch(e){}
     try { frame2 = await preload('images/frame2.png'); } catch(e){}
-    fitOverlayToVideo(); setMode('frame1');
+    try { frame3 = await preload('images/frame3.png'); } catch(e){}
+    fitOverlayToVideo(); setMode('frame3');
   })();
   </script>
 </body>
