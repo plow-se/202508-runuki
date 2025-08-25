@@ -45,7 +45,6 @@
       <div class="controls">
         <button id="btnStart" class="primary">🎥 カメラ開始</button>
         <button id="btnShot" class="success" disabled>📸 撮影</button>
-        <button id="btnDownload" class>⬇️ ダウンロード</button>
         <div class="spacer"></div>
         <button id="modeNone" class="">フレーム：なし</button>
         <button id="modeFrame1" class="">🌊 リゾートA</button>
@@ -75,7 +74,6 @@
   const stage = document.getElementById('stage');
   const btnStart = document.getElementById('btnStart');
   const btnShot = document.getElementById('btnShot');
-  const btnDownload = document.getElementById('btnDownload');
   const modeNone = document.getElementById('modeNone');
   const modeFrame1 = document.getElementById('modeFrame1');
   const modeFrame2 = document.getElementById('modeFrame2');
@@ -205,11 +203,7 @@ function makeFilename(mode){
   lastBlobUrl = URL.createObjectURL(blob);
   // ファイル名を作ってボタンに保持
   const fname = makeFilename(mode);
-  btnDownload.dataset.href = lastBlobUrl;
-  btnDownload.dataset.filename = fname;
-
-  btnDownload.classList.add('primary');
-  btnDownload.textContent = `⬇️ ダウンロード（${fname}）`;
+  
 
   // 連写しやすくするなら、撮影直後に自動DLする場合はこの行をON
   triggerDownload();
@@ -235,8 +229,6 @@ function triggerDownload(){
   }
 }
 
-  btnDownload.addEventListener('click', ()=>{
-    triggerDownload();
   });
 
   // 画像フレームのプリロード（リポジトリに images/frame1.png, images/frame2.png を置いてください）
