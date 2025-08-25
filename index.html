@@ -54,7 +54,7 @@
         <label class="button" for="customImg">🖼️ カスタム画像</label>
         <input type="file" id="customImg" accept="image/*" />
       </div>
-      <div class="row"" id="tips">
+      <div class="row" id="tips">
         <div class="chip">🔊 シャッター音は鳴りません</div>
         <div class="chip">🔒 画像は端末内で処理（サーバー送信なし）</div>
         <div class="chip">📶 HTTPSでの公開推奨（iOS Safari要件）</div>
@@ -91,6 +91,17 @@
   let frame3 = null; // PLOWと写真
   let mode = 'frame1';
 
+  function pad2(n){ return String(n).padStart(2,'0'); }
+function makeFilename(mode){
+  const d = new Date();
+  const y = d.getFullYear(), m = pad2(d.getMonth()+1), day = pad2(d.getDate());
+  const h = pad2(d.getHours()), mi = pad2(d.getMinutes()), s = pad2(d.getSeconds());
+  const labelMap = { frame1: 'resortA', frame2: 'shisaB', frame3: 'plow', none: 'noframe' };
+  const label = labelMap[mode] || 'other';
+  return `runuki-${y}${m}${day}-${h}${mi}${s}-${label}.jpg`;
+}
+
+    
   // サイズ調整
   function fitOverlayToVideo(){
     const rect = stage.getBoundingClientRect();
@@ -189,21 +200,40 @@
       ctx.globalAlpha = 1;
     }
 
-    canvas.toBlob((blob)=>{
-      if(lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
-      lastBlobUrl = URL.createObjectURL(blob);
-      btnDownload.dataset.href = lastBlobUrl;
-      btnDownload.classList.add('primary');
-      btnDownload.textContent = '⬇️ ダウンロード（撮影済み）';
-      // 直後にプレビュー的に自動ダウンロードしたい場合は以下を有効化：
-      // triggerDownload();
-    }, 'image/jpeg', 0.92);
+ canvas.toBlob((blob)=>{
+  if(lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
+  lastBlobUrl = URL.createObjectURL(blob);
+  // ファイル名を作ってボタンに保持
+  const fname = makeFilename(mode);
+  btnDownload.dataset.href = lastBlobUrl;
+  btnDownload.dataset.filename = fname;
+
+  btnDownload.classList.add('primary');
+  btnDownload.textContent = `⬇️ ダウンロード（${fname}）`;
+
+  // 連写しやすくするなら、撮影直後に自動DLする場合はこの行をON
+  // triggerDownload();
+}, 'image/jpeg', 0.92);
   });
 
-  function triggerDownload(){
-    const url = btnDownload.dataset.href; if(!url){ return; }
-    const a = document.createElement('a'); a.href = url; a.download = 'runuki-photo.jpg'; a.click();
+function triggerDownload(){
+  const url = btnDownload.dataset.href; 
+  const name = btnDownload.dataset.filename || makeFilename(mode);
+  if(!url) return;
+
+  // Android/PC用：download属性が効く場合はファイル名を指定
+  const a = document.createElement('a');
+  a.href = url;
+  if('download' in HTMLAnchorElement.prototype){
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } else {
+    // iOS Safariなど：新しいタブで開いて「写真に保存」を促す
+    window.open(url, '_blank');
   }
+}
 
   btnDownload.addEventListener('click', ()=>{
     triggerDownload();
