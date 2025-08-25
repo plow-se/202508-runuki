@@ -1,3 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>ルンウキ フォトカメラ｜釣り×沖縄フレーム</title>
+  <style>
+    :root { --bg:#0f172a; --card:#111827; --text:#e5e7eb; --accent:#22d3ee; }
+    *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#0b1223,#101827);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif}
+    header{padding:14px 16px;border-bottom:1px solid #243147;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    header h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.02em}
+    .badge{font-size:12px;background:#0ea5a5;color:#00120f;padding:4px 8px;border-radius:999px}
+    main{max-width:900px;margin:0 auto;padding:16px;display:grid;gap:16px}
+    .card{background:rgba(17,24,39,.7);border:1px solid #243147;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.35)}
+    .stage{position:relative;aspect-ratio:3/4;width:100%;border-radius:16px;overflow:hidden}
+    video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+    canvas.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+    .controls{display:flex;flex-wrap:wrap;gap:12px;padding:12px}
+    .controls .spacer{flex:1}
+    button, label.button{appearance:none;border:none;border-radius:12px;padding:10px 14px;background:#1f2937;color:#e5e7eb;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+    button:hover, label.button:hover{filter:brightness(1.1)}
+    button.primary{background:linear-gradient(180deg,#06b6d4,#0891b2)}
+    button.success{background:linear-gradient(180deg,#16a34a,#15803d)}
+    button.warn{background:linear-gradient(180deg,#f59e0b,#d97706)}
+    input[type=file]{display:none}
+    .row{display:flex;gap:12px;flex-wrap:wrap;padding:12px}
+    .row .chip{background:#0b1223;border:1px solid #243147;border-radius:999px;padding:8px 12px;cursor:pointer}
+    .hint{opacity:.8;font-size:12px;padding:0 12px 12px}
+    footer{padding:12px 16px;color:#94a3b8;font-size:12px;text-align:center}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📸 ルンウキ フォトカメラ <span class="badge">アプリ不要・QRで起動</span></h1>
+    <div style="font-size:12px;opacity:.8">「撮影」→「ダウンロード」で保存できます</div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="stage" id="stage">
+        <video id="video" playsinline muted></video>
+        <!-- ライブ用オーバーレイ -->
+        <canvas id="overlay" class="overlay"></canvas>
+      </div>
+      <div class="controls">
+        <button id="btnStart" class="primary">🎥 カメラ開始</button>
+        <button id="btnShot" class="success" disabled>📸 撮影</button>
+        <div class="spacer"></div>
+        <button id="modeNone" class="">フレーム：なし</button>
+        <button id="modeFrame1" class="">🌊 リゾートA</button>
+        <button id="modeFrame2" class="">🦁 シーサーB</button>
+        <button id="modeFrame3" class="">🧩 PLOWと写真</button>
+        <label class="button" for="customImg">🖼️ カスタム画像</label>
+        <input type="file" id="customImg" accept="image/*" />
+      </div>
+      <div class="row" id="tips">
+        <div class="chip">🔊 シャッター音は鳴りません</div>
+        <div class="chip">🔒 画像は端末内で処理（サーバー送信なし）</div>
+        <div class="chip">📶 HTTPSでの公開推奨（iOS Safari要件）</div>
+      </div>
+      <div class="hint">※ カメラが映らない場合：Safari/Chromeのカメラ許可をONにし、再読み込みしてください。</div>
+    </section>
+
+
+  </main>
+
+  <footer>© 2025 ルンウキマーケット / プラウ経験型教育塾 撮影ブース（デモ）</footer>
+
 <script>
   const video = document.getElementById('video');
   const overlay = document.getElementById('overlay');
@@ -171,3 +239,6 @@
     setMode('frame3'); // 起動時にPLOWと写真を表示
   })();
 </script>
+
+</body>
+</html>
